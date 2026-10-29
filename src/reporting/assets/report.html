@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light">
+  <title>Воздушная обстановка · @@TITLE@@</title>
+  <style>@@LEAFLET_CSS@@</style>
+  <style>@@REPORT_CSS@@</style>
+</head>
+<body>
+  <header class="hero">
+    <div class="hero-inner">
+      <div class="hero-top"><a class="wordmark" href="#overview" aria-label="К началу отчёта"><span class="wordmark-icon" aria-hidden="true">✈</span> SKY / OBSERVER</a><span class="snapshot-badge"><span></span> СНИМОК ДАННЫХ</span></div>
+      <div class="hero-main"><div><p class="eyebrow">ВОЗДУШНАЯ ОБСТАНОВКА</p><h1 id="country-title">@@TITLE@@</h1><p class="hero-caption">Один момент. Полная картина полётов.</p></div><button class="print-button" id="print-report" type="button"><span aria-hidden="true">↗</span> Печать / PDF</button></div>
+      <div class="hero-meta"><span id="snapshot-time"></span><span id="received-time"></span><span>OpenSky Network</span></div>
+    </div>
+  </header>
+  <main class="page" id="overview">
+    <section class="stats-grid" aria-label="Статистика снимка">
+      <article class="stat-card stat-primary"><p>Самолётов в снимке</p><strong id="stat-total">—</strong><small id="stat-status">—</small><span class="stat-glyph" aria-hidden="true">✈</span></article>
+      <article class="stat-card"><p>В воздухе</p><strong id="stat-airborne">—</strong><small>активных полётов</small><span class="stat-glyph" aria-hidden="true">↗</span></article>
+      <article class="stat-card"><p>Средняя высота</p><strong id="stat-altitude">—</strong><small>по известным значениям</small></article>
+      <article class="stat-card"><p>Средняя скорость</p><strong id="stat-speed">—</strong><small id="stat-speed-detail">по известным значениям</small></article>
+    </section>
+    <section class="card map-card" aria-labelledby="map-heading">
+      <div class="section-heading"><div><p class="eyebrow">ГЕОГРАФИЯ ПОЛЁТОВ</p><h2 id="map-heading">Самолёты на карте</h2></div><button class="quiet-button" id="reset-view" type="button">↗ Вся область</button></div>
+      <div class="filters" role="search" aria-label="Фильтры карты и таблицы">
+        <label class="search-field"><span>Поиск по позывному или ICAO24</span><input id="search" type="search" placeholder="Например, UAL1621 или a1b2c3" autocomplete="off"></label>
+        <label><span>Страна регистрации</span><select id="origin-filter"><option value="">Все страны</option></select></label>
+        <label><span>Состояние</span><select id="status-filter"><option value="all">Все самолёты</option><option value="air">В воздухе</option><option value="ground">На земле</option></select></label>
+        <button class="filter-reset" id="reset-filters" type="button" title="Сбросить фильтры">Сбросить</button>
+      </div>
+      <div class="map-shell"><div id="flight-map" aria-label="Интерактивная карта самолётов"></div><div class="map-label"><span class="map-label-dot"></span><span id="map-count" role="status" aria-live="polite"></span></div><div class="map-empty" id="map-empty" hidden></div></div>
+      <div class="map-footer"><div class="legend" aria-label="Высота самолётов"><span><i style="--legend-color:#40d6b3"></i> &lt; 3 000 м</span><span><i style="--legend-color:#69aef8"></i> 3 000 ≤ h &lt; 9 000 м</span><span><i style="--legend-color:#ffb36b"></i> ≥ 9 000 м</span><span><i style="--legend-color:#9aa9bd"></i> Нет высоты</span></div><p id="coordinates-note"></p></div>
+      <p class="map-note"><span aria-hidden="true">ⓘ</span> Пунктирная рамка — прямоугольная область запроса. Она может захватывать соседние страны. Контуры стран схематичны; карта работает без интернета.</p>
+    </section>
+    <div class="insight-grid">
+      <section class="card chart-card" aria-labelledby="registration-heading"><div class="section-heading"><div><p class="eyebrow">СТРУКТУРА СНИМКА</p><h2 id="registration-heading">Страны регистрации</h2></div><span class="section-chip" id="registration-total"></span></div><div id="registration-chart" class="chart" role="img" aria-label="Распределение по странам регистрации"></div></section>
+      <section class="card chart-card" aria-labelledby="altitude-heading"><div class="section-heading"><div><p class="eyebrow">ЭШЕЛОНЫ</p><h2 id="altitude-heading">Распределение высот</h2></div><span class="section-chip">метры</span></div><div id="altitude-chart" class="chart" role="img" aria-label="Распределение самолётов по высоте"></div></section>
+    </div>
+    <section class="card top-card" aria-labelledby="top-heading"><div class="section-heading"><div><p class="eyebrow">ВЫШЕ ВСЕХ</p><h2 id="top-heading">Топ-10 по высоте</h2></div><span class="section-chip">по убыванию ↓</span></div><div class="table-scroll"><table class="data-table top-table"><thead><tr><th class="rank-column">№</th><th>Позывной / ICAO24</th><th>Страна регистрации</th><th>Высота, м</th><th>Скорость, м/с</th></tr></thead><tbody id="top-body"></tbody></table></div><p class="table-note">Топ и диаграммы относятся ко всему снимку. Самолёты без известной высоты в топ не входят.</p></section>
+    <section class="card all-card" aria-labelledby="all-heading"><div class="section-heading"><div><p class="eyebrow">ПОЛНЫЙ СПИСОК</p><h2 id="all-heading">Наблюдения</h2></div><span class="section-chip" id="table-count" role="status" aria-live="polite"></span></div><div class="table-scroll"><table class="data-table all-table"><thead><tr><th><button type="button" data-sort="callsign">Позывной / ICAO24 <span></span></button></th><th><button type="button" data-sort="origin_country">Страна регистрации <span></span></button></th><th aria-sort="descending"><button type="button" data-sort="altitude">Высота, м <span>↓</span></button></th><th><button type="button" data-sort="velocity">Скорость, м/с <span></span></button></th><th><button type="button" data-sort="on_ground">Состояние <span></span></button></th><th>Позиция</th></tr></thead><tbody id="aircraft-body"></tbody></table></div><p class="table-note">Нажмите на заголовок для сортировки, на строку с координатами — чтобы найти самолёт на карте. Неизвестные значения всегда в конце.</p></section>
+    <aside class="method-note"><span aria-hidden="true">◷</span><div><strong>Сохранённый снимок, без автоматического обновления</strong><p>Высота указана в метрах, скорость в таблицах — в метрах в секунду. Карточка средней скорости также показывает км/ч. Средние рассчитаны только по известным значениям. Отсутствующие координаты не исключают самолёт из статистики и таблиц.</p></div></aside>
+    <footer class="footer"><span class="footer-brand">SKY / OBSERVER <span>Курсовой проект · дополнительный отчёт</span></span><span>Данные: OpenSky Network · Область: Nominatim / OpenStreetMap<br>Подложка: Natural Earth 1:110m (public domain) · Карта: Leaflet 1.9.4 (BSD-2-Clause)</span></footer>
+  </main>
+  <noscript><p class="noscript-note">Для карты, фильтров и таблиц включите JavaScript в браузере. Интернет для просмотра отчёта не требуется.</p></noscript>
+  <script id="report-data" type="application/json">@@DATA@@</script>
+  <script id="world-data" type="application/json">@@GEOGRAPHY@@</script>
+  <!-- Leaflet license, included for redistribution of this standalone file:
+@@LEAFLET_LICENSE@@
+  -->
+  <script>@@LEAFLET_JS@@</script>
+  <script>@@REPORT_JS@@</script>
+</body>
+</html>
